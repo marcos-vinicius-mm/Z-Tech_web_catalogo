@@ -1,9 +1,9 @@
 // Única fonte de configuração do site. Edite apenas este arquivo.
 window.CONFIG = {
   NOME: 'Z-Tech Informática',
-  WHATSAPP: '5500000000000', // PENDENTE: número real, só dígitos, com 55 + DDD
-  API_URL: '',               // PENDENTE: URL do Web App do Apps Script. Vazio = dados de demonstração
-  ENDERECO: 'Endereço a definir',
-  HORARIO: 'Horário a definir',
+  WHATSAPP: '5588996394456', // PENDENTE: número real, só dígitos, com 55 + DDD
+  API_URL: 'https://script.google.com/macros/s/AKfycbzYJGzf5XdsMWUBuu0TjITgMrqjBo4UVBz6hTjtVk_wnwRby3uz6UmOteT-sCZeh9Np/exec', // URL do Web App do Apps Script
+  ENDERECO: 'R. Alfredo Fernandes Franco - Centro, Piquet Carneiro - CE, 63605-000',
+  HORARIO: '07:00 às 17:00',
   TIMEOUT_MS: 8000
 };
