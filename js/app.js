@@ -11,9 +11,17 @@
   }
   const zap = (msg) => 'https://wa.me/' + CONFIG.WHATSAPP + '?text=' + encodeURIComponent(msg);
 
+  // Se a foto não carregar (arquivo do Drive não compartilhado, link quebrado), mostra o aviso no lugar.
   function imagem(item) {
     if (!item.imagem) return el('div', 'sem-img', 'Sem foto');
-    const i = el('img'); i.src = item.imagem; i.alt = item.nome; i.loading = 'lazy'; return i;
+    const i = el('img');
+    i.alt = item.nome; i.loading = 'lazy'; i.referrerPolicy = 'no-referrer';
+    i.addEventListener('error', () => {
+      console.warn('[Z-Tech] Foto não carregou (confira o link e o compartilhamento):', item.id, item.imagem);
+      i.replaceWith(el('div', 'sem-img', 'Foto indisponível'));
+    }, { once: true });
+    i.src = item.imagem;
+    return i;
   }
 
   function card(item, aba, abrir) {
@@ -46,6 +54,15 @@
 
   function estado(msg, erro) { const s = $('#estado'); s.textContent = msg; s.hidden = !msg; s.className = 'estado' + (erro ? ' erro' : ''); }
 
+  // Rodapé comum às três páginas: endereço, horário e link "Como chegar" (Google Maps).
+  function rodape() {
+    const p = $('#endereco'); if (!p) return;
+    const a = el('a', null, 'Como chegar');
+    a.href = CONFIG.MAPS_URL || 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(CONFIG.ENDERECO);
+    a.target = '_blank'; a.rel = 'noopener';
+    p.replaceChildren(CONFIG.ENDERECO + ' | ' + CONFIG.HORARIO + ' | ', a);
+  }
+
   async function iniciar() {
     const aba = document.body.dataset.aba; // 'loja' | 'assistencia'
     estado('Carregando...');
@@ -75,6 +92,7 @@
   }
 
   document.addEventListener('DOMContentLoaded', () => {
+    rodape();
     const fechar = $('#fechar'); if (fechar) fechar.addEventListener('click', () => $('#detalhe').close());
     if (document.body.dataset.aba) iniciar();
   });

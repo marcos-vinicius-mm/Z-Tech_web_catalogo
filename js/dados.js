@@ -20,11 +20,26 @@
     if (!s) return { tipo: 'vazio' };
     if (/^sob or[cç]amento$/i.test(s)) return { tipo: 'texto', texto: 'Sob orçamento' };
     const m = s.match(/^(a partir de\s+)?(?:R\$\s*)?(\d{1,3}(?:\.\d{3})+(?:,\d{1,2})?|\d+(?:,\d{1,2})?)$/i);
-    if (!m) { console.warn('[Z Tech] Preço rejeitado (formato inválido):', s); return { tipo: 'invalido' }; }
+    if (!m) { console.warn('[Z-Tech] Preço rejeitado (formato inválido):', s); return { tipo: 'invalido' }; }
     return { tipo: 'valor', valor: Number(m[2].replace(/\./g, '').replace(',', '.')), prefixo: m[1] ? 'A partir de ' : '' };
   }
 
-  const urlImagem = (v) => (/^https?:\/\//i.test(t(v)) ? t(v) : '');
+  // Imagem: aceita URL pública (http vira https) ou link de compartilhamento do Google Drive.
+  // Links do Drive não funcionam em <img>; aqui viram a URL de miniatura pelo código do arquivo.
+  // O arquivo precisa estar compartilhado como "Qualquer pessoa com o link".
+  function resolverImagem(bruto) {
+    const s = t(bruto).replace(/\s+/g, '');
+    if (!s) return '';
+    if (/^https?:\/\/drive\.google\.com\//i.test(s)) {
+      if (/\/folders\//i.test(s)) { console.warn('[Z-Tech] Imagem ignorada (link de pasta do Drive; use o link do arquivo):', s); return ''; }
+      const m = s.match(/\/file\/d\/([\w-]{10,})/i) || s.match(/[?&]id=([\w-]{10,})/i);
+      if (!m) { console.warn('[Z-Tech] Imagem ignorada (link do Drive sem código de arquivo):', s); return ''; }
+      return 'https://drive.google.com/thumbnail?id=' + m[1] + '&sz=w1000';
+    }
+    if (/^https?:\/\//i.test(s)) return s.replace(/^http:\/\//i, 'https://');
+    console.warn('[Z-Tech] Imagem ignorada (não é uma URL http/https):', s);
+    return '';
+  }
 
   function normalizar(linhas) {
     return (Array.isArray(linhas) ? linhas : [])
@@ -32,7 +47,7 @@
       .map((l) => ({
         id: t(l.id), nome: t(l.nome), tipo: t(l.tipo).toLowerCase(), categoria: t(l.categoria) || 'Outros',
         marca: t(l.marca), descricao: t(l.descricao), preco: lerPreco(l.preco), estoque: t(l.estoque),
-        condicao: t(l.condicao).toLowerCase(), compatibilidade: t(l.compatibilidade), imagem: urlImagem(l.imagem),
+        condicao: t(l.condicao).toLowerCase(), compatibilidade: t(l.compatibilidade), imagem: resolverImagem(l.imagem),
         destaque: t(l.destaque).toUpperCase() === 'SIM', prazo: t(l.prazo), garantia: t(l.garantia), equipamentos: t(l.equipamentos)
       }));
   }
@@ -48,7 +63,7 @@
       try { localStorage.setItem(CHAVE, JSON.stringify(dados)); } catch (e) { /* sem cache */ }
       return { dados, origem: 'rede' };
     } catch (erro) {
-      console.warn('[Z Tech] Falha ao ler a planilha:', erro);
+      console.warn('[Z-Tech] Falha ao ler a planilha:', erro);
       try {
         const salvo = JSON.parse(localStorage.getItem(CHAVE));
         if (salvo) return { dados: salvo, origem: 'cache' };
@@ -58,6 +73,7 @@
   }
 
   window.Dados = {
+    resolverImagem,
     async carregar(aba) {
       const { dados, origem } = await buscar();
       return { itens: normalizar(dados[aba]), origem };
