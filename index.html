@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Z-Tech Informática | Assistência técnica e peças</title>
+<meta name="description" content="Produtos e peças de informática e assistência técnica. Peça pelo WhatsApp.">
+<meta property="og:title" content="Z-Tech Informática">
+<meta property="og:description" content="Produtos e peças de informática e assistência técnica. Peça pelo WhatsApp.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="img/logo.jpg">
+<meta name="theme-color" content="#000000">
+<link rel="icon" type="image/png" href="img/marca.png">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<header class="topo"><div class="topo-in"><a class="marca" href="index.html"><img src="img/marca.png" alt="" width="40" height="40"><span>Z-TECH</span></a>
+<nav aria-label="Principal"><a href="index.html" aria-current="page">Início</a><a href="loja.html">Loja</a><a href="assistencia.html">Assistência técnica</a></nav></div></header>
+<section class="hero">
+<img src="img/logo.jpg" alt="Z-Tech Informática" width="900" height="740">
+<p>Veja o que temos em estoque ou peça um orçamento de conserto. O atendimento é pelo WhatsApp.</p>
+<a class="btn" id="zap" href="#" target="_blank" rel="noopener">Falar no WhatsApp</a>
+</section>
+<main>
+<h1 hidden>Z-Tech Informática</h1>
+<div class="atalhos"><a class="atalho" href="loja.html"><strong>Loja</strong>Produtos e peças</a><a class="atalho" href="assistencia.html"><strong>Assistência técnica</strong>Serviços e consertos</a></div>
+</main>
+<footer class="rodape"><p id="endereco"></p></footer>
+<script src="js/config.js"></script>
+<script src="js/dados.js"></script>
+<script src="js/app.js"></script>
+<script>
+document.getElementById('zap').href='https://wa.me/'+CONFIG.WHATSAPP+'?text='+encodeURIComponent('Olá! Vim pelo site da Z-Tech Informática.');
+document.getElementById('endereco').textContent=CONFIG.ENDERECO+' | '+CONFIG.HORARIO;
+</script>
+</body>
+</html>
