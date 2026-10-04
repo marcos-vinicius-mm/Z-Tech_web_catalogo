@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Loja | Z-Tech Informática</title>
+<meta name="description" content="Produtos e peças de informática da Z-Tech Informática.">
+<meta property="og:title" content="Loja | Z-Tech Informática">
+<meta property="og:description" content="Produtos e peças de informática da Z-Tech Informática.">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#000000">
+<meta property="og:image" content="img/logo.jpg">
+<link rel="icon" type="image/png" href="img/marca.png">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-aba="loja">
+<header class="topo"><div class="topo-in"><a class="marca" href="index.html"><img src="img/marca.png" alt="" width="40" height="40"><span>Z-TECH</span></a>
+<nav aria-label="Principal"><a href="index.html">Início</a><a href="loja.html" aria-current="page">Loja</a><a href="assistencia.html">Assistência técnica</a></nav></div></header>
+<main>
+<h1>Loja</h1>
+<div class="filtros"><input id="busca" type="search" placeholder="Buscar item" aria-label="Buscar item">
+<select id="tipo" aria-label="Tipo"><option value="">Produtos e peças</option><option value="produto">Produtos</option><option value="peca">Peças</option></select>
+<select id="categoria" aria-label="Categoria"><option value="">Todas as categorias</option></select>
+<select id="ordem" aria-label="Ordenar"><option value="">Destaques</option><option value="menor">Menor preço</option><option value="maior">Maior preço</option></select></div>
+<p id="aviso" class="aviso" role="status"></p>
+<p id="estado" class="estado" role="status" hidden></p>
+<div id="grade" class="grade"></div>
+<dialog id="detalhe" aria-label="Detalhes"><div id="detalhe-conteudo"></div><p><button id="fechar" class="btn" type="button">Fechar</button></p></dialog>
+</main>
+<footer class="rodape"><p id="endereco"></p></footer>
+<script src="js/config.js"></script>
+<script src="js/dados.js"></script>
+<script src="js/app.js"></script>
+<script>document.getElementById('endereco').textContent=CONFIG.ENDERECO+' | '+CONFIG.HORARIO;</script>
+</body>
+</html>

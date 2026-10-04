@@ -1,0 +1,39 @@
+/* Identidade Z-Tech: preto, branco e o vermelho da logo (#C22127). */
+:root{--preto:#000;--tinta:#111;--branco:#fff;--vermelho:#c22127;--vermelho-esc:#9a1a1f;--cinza:#555;--linha:#ddd;--fundo:#f4f4f4;--raio:4px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--fundo);color:var(--tinta);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:var(--vermelho-esc)} :focus-visible{outline:3px solid var(--vermelho);outline-offset:2px}
+.topo :focus-visible,.hero :focus-visible{outline-color:#fff}
+.topo{background:var(--preto);color:#fff;border-bottom:3px solid var(--vermelho)}
+.topo-in,main,.rodape{max-width:68rem;margin:0 auto;padding:1rem}
+.topo-in{display:flex;flex-wrap:wrap;gap:.5rem 1.5rem;align-items:center;justify-content:space-between}
+.marca{display:flex;align-items:center;gap:.6rem;color:#fff;text-decoration:none;font:italic 800 1.5rem Georgia,"Times New Roman",serif}
+.marca img{display:block;border-radius:50%}
+nav a{color:#fff;margin-right:1rem;padding:.25rem 0;text-decoration:none;border-bottom:2px solid transparent}
+nav a[aria-current=page],nav a:hover{border-color:var(--vermelho)}
+h1,h2{font-family:Georgia,"Times New Roman",serif;font-style:italic;letter-spacing:-.01em}
+h1{font-size:clamp(1.8rem,5vw,2.6rem);line-height:1.1;margin:1rem 0 .5rem}
+.hero{background:var(--preto);color:#fff;text-align:center;padding:1.5rem 1rem 2.5rem}
+.hero img{width:min(20rem,70%);height:auto;display:block;margin:0 auto}
+.hero p{max-width:34rem;margin:.5rem auto 1.2rem;color:#e6e6e6}
+.atalhos{display:grid;gap:1rem;grid-template-columns:repeat(auto-fit,minmax(15rem,1fr));margin:1.5rem 0}
+.atalho{display:block;padding:1.5rem;border:2px solid var(--preto);border-radius:var(--raio);text-decoration:none;color:var(--tinta);background:#fff}
+.atalho:hover{background:var(--preto);color:#fff;border-color:var(--vermelho)}.atalho strong{font-size:1.3rem;display:block}
+.btn{display:inline-block;background:var(--vermelho);color:#fff;font:inherit;font-weight:700;padding:.7rem 1.2rem;border-radius:var(--raio);text-decoration:none;border:0;cursor:pointer}
+.btn:hover{background:var(--vermelho-esc)}
+.filtros{display:grid;gap:.6rem;grid-template-columns:repeat(auto-fit,minmax(9rem,1fr));margin:1rem 0}
+.filtros input,.filtros select{padding:.6rem;border:1px solid #999;border-radius:var(--raio);font:inherit;background:#fff;width:100%}
+.grade{display:grid;gap:1rem;grid-template-columns:repeat(auto-fill,minmax(14rem,1fr))}
+.card{background:#fff;border:1px solid var(--linha);border-top:3px solid var(--vermelho);border-radius:var(--raio);overflow:hidden;display:flex;flex-direction:column}
+.card img,.sem-img{width:100%;aspect-ratio:4/3;object-fit:cover;background:#eee;display:grid;place-items:center;color:var(--cinza)}
+.card-corpo{padding:.8rem}.card h3{margin:.2rem 0;font-size:1.05rem}.cat,.meta{margin:0;color:var(--cinza);font-size:.85rem}
+.link-titulo{all:unset;cursor:pointer;color:var(--tinta);font-weight:700}.link-titulo:hover{color:var(--vermelho-esc);text-decoration:underline}
+.link-titulo:focus-visible{outline:3px solid var(--vermelho);outline-offset:2px}
+.preco{font-weight:800;margin:.3rem 0}
+.estado{padding:1rem;background:#fff;border:1px dashed #999;border-radius:var(--raio)}.estado.erro{border-color:var(--vermelho-esc);color:var(--vermelho-esc)}
+.aviso{color:var(--cinza);font-size:.9rem}
+dialog{max-width:32rem;width:calc(100% - 2rem);border:0;border-top:4px solid var(--vermelho);border-radius:var(--raio);padding:1.2rem}dialog::backdrop{background:#000a}
+dialog img{width:100%;max-height:16rem;object-fit:cover;border-radius:var(--raio)}
+dl{display:grid;grid-template-columns:auto 1fr;gap:.2rem 1rem}dt{font-weight:700}dd{margin:0}
+.rodape{color:var(--cinza);font-size:.9rem;border-top:1px solid var(--linha);margin-top:2rem}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
