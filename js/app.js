@@ -13,7 +13,7 @@
 
   // Se a foto não carregar (arquivo do Drive não compartilhado, link quebrado), mostra o aviso no lugar.
   function imagem(item) {
-    if (!item.imagem) return el('div', 'sem-img', 'Sem foto');
+    if (!item.imagem) { const ph = el('div', 'sem-img marca-ph'); ph.setAttribute('aria-hidden', 'true'); return ph; }
     const i = el('img');
     i.alt = item.nome; i.loading = 'lazy'; i.referrerPolicy = 'no-referrer';
     i.addEventListener('error', () => {
@@ -84,6 +84,12 @@
     const filtros = { q: $('#busca'), cat: $('#categoria'), tipo: $('#tipo'), ord: $('#ordem') };
     [...new Set(itens.map((i) => i.categoria))].sort().forEach((c) => filtros.cat.append(new Option(c, c)));
 
+    // Barra de resultado: quantidade de itens e atalho para limpar os filtros.
+    const cont = el('span'); cont.setAttribute('aria-live', 'polite');
+    const limpar = el('button', 'limpar', 'Limpar filtros'); limpar.type = 'button';
+    const barra = el('div', 'resultado'); barra.append(cont, limpar); $('.filtros').after(barra);
+    limpar.addEventListener('click', () => { filtros.q.value = ''; filtros.cat.value = ''; if (filtros.tipo) filtros.tipo.value = ''; desenhar(); filtros.q.focus(); });
+
     function desenhar() {
       const q = filtros.q.value.trim().toLowerCase();
       let lista = itens.filter((i) =>
@@ -94,6 +100,8 @@
       const o = filtros.ord.value;
       lista.sort(o === 'menor' ? (a, b) => valor(a) - valor(b) : o === 'maior' ? (a, b) => (valor(b) === Infinity ? -1 : valor(b)) - (valor(a) === Infinity ? -1 : valor(a)) : (a, b) => (b.destaque - a.destaque) || a.nome.localeCompare(b.nome, 'pt-BR'));
       const grade = $('#grade'); grade.replaceChildren(...lista.map((i) => card(i, aba, (x) => detalhe(x, aba))));
+      cont.textContent = lista.length + (lista.length === 1 ? ' item' : ' itens');
+      limpar.hidden = !(q || filtros.cat.value || (filtros.tipo && filtros.tipo.value));
       estado(lista.length ? '' : 'Nenhum item encontrado. Limpe a busca ou troque os filtros.');
     }
     Object.values(filtros).forEach((f) => f && f.addEventListener('input', desenhar));
