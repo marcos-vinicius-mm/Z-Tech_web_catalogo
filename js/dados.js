@@ -52,24 +52,45 @@
       }));
   }
 
-  async function buscar() {
-    if (!CONFIG.API_URL) return { dados: DEMO, origem: 'demo' };
+  function erro(motivo, causa, definitivo) { const e = new Error(motivo); e.motivo = motivo; e.causa = causa; e.definitivo = !!definitivo; return e; }
+
+  // Uma tentativa de leitura. O motivo da falha fica explícito para facilitar o diagnóstico em outros aparelhos.
+  async function lerPlanilha() {
     const ctl = new AbortController();
     const timer = setTimeout(() => ctl.abort(), CONFIG.TIMEOUT_MS);
     try {
-      const r = await fetch(CONFIG.API_URL, { signal: ctl.signal });
-      if (!r.ok) throw new Error('HTTP ' + r.status);
-      const dados = await r.json();
-      try { localStorage.setItem(CHAVE, JSON.stringify(dados)); } catch (e) { /* sem cache */ }
-      return { dados, origem: 'rede' };
-    } catch (erro) {
-      console.warn('[Z-Tech] Falha ao ler a planilha:', erro);
-      try {
-        const salvo = JSON.parse(localStorage.getItem(CHAVE));
-        if (salvo) return { dados: salvo, origem: 'cache' };
-      } catch (e) { /* cache inválido */ }
-      throw erro;
+      let r;
+      try { r = await fetch(CONFIG.API_URL, { signal: ctl.signal }); }
+      catch (e) { throw erro(e.name === 'AbortError' ? 'tempo esgotado: a planilha demorou demais para responder' : 'sem conexão ou acesso bloqueado pela rede', e); }
+      if (!r.ok) throw erro('o Apps Script respondeu HTTP ' + r.status, null, r.status >= 400 && r.status < 500);
+      const texto = await r.text();
+      let dados;
+      try { dados = JSON.parse(texto); }
+      catch (e) { throw erro(/^\s*</.test(texto) ? 'o Apps Script devolveu uma página em vez de JSON: confira se a implantação está com acesso "Qualquer pessoa" e se a URL termina em /exec' : 'resposta inválida (não é JSON)', e, true); }
+      if (!dados || (!Array.isArray(dados.loja) && !Array.isArray(dados.assistencia))) throw erro('o JSON não traz as abas "loja" e "assistencia"', null, true);
+      return dados;
     } finally { clearTimeout(timer); }
+  }
+
+  async function buscar() {
+    if (!CONFIG.API_URL) return { dados: DEMO, origem: 'demo' };
+    let ultimo;
+    for (let tentativa = 1; tentativa <= 2; tentativa++) {
+      try {
+        const dados = await lerPlanilha();
+        try { localStorage.setItem(CHAVE, JSON.stringify(dados)); } catch (e) { /* sem cache */ }
+        return { dados, origem: 'rede' };
+      } catch (e) {
+        ultimo = e;
+        console.warn('[Z-Tech] Falha ao ler a planilha (tentativa ' + tentativa + '):', e.motivo || e, e.causa || '');
+        if (e.definitivo) break; // erro de configuração: repetir não adianta
+      }
+    }
+    try {
+      const salvo = JSON.parse(localStorage.getItem(CHAVE));
+      if (salvo) return { dados: salvo, origem: 'cache' };
+    } catch (e) { /* cache inválido */ }
+    throw ultimo;
   }
 
   window.Dados = {
