@@ -54,6 +54,13 @@
 
   function estado(msg, erro) { const s = $('#estado'); s.textContent = msg; s.hidden = !msg; s.className = 'estado' + (erro ? ' erro' : ''); }
 
+  // Falha de leitura: mostra o motivo e um botão para tentar de novo.
+  function falha(e) {
+    const s = $('#estado'); s.hidden = false; s.className = 'estado erro'; s.replaceChildren();
+    const b = el('button', 'btn', 'Tentar novamente'); b.type = 'button'; b.addEventListener('click', () => location.reload());
+    s.append(el('strong', null, 'Não foi possível carregar a lista.'), el('p', 'motivo', 'Motivo: ' + (e && e.motivo ? e.motivo : 'erro desconhecido')), b);
+  }
+
   // Rodapé comum às três páginas: endereço, horário e link "Como chegar" (Google Maps).
   function rodape() {
     const p = $('#endereco'); if (!p) return;
@@ -65,9 +72,11 @@
 
   async function iniciar() {
     const aba = document.body.dataset.aba; // 'loja' | 'assistencia'
-    estado('Carregando...');
+    estado('Carregando itens...');
+    const espera = setTimeout(() => estado('Ainda carregando... a primeira leitura da planilha pode levar alguns segundos.'), 4000);
     let res;
-    try { res = await Dados.carregar(aba); } catch (e) { estado('Não foi possível carregar a lista. Verifique a conexão e recarregue a página.', true); return; }
+    try { res = await Dados.carregar(aba); } catch (e) { clearTimeout(espera); falha(e); return; }
+    clearTimeout(espera);
     let itens = res.itens;
     const aviso = { demo: 'Dados de demonstração: configure API_URL em js/config.js.', cache: 'Sem conexão com a planilha. Mostrando os últimos dados salvos.' }[res.origem];
     if (aviso) $('#aviso').textContent = aviso;
