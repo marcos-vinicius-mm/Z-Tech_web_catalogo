@@ -8,24 +8,25 @@ a{color:var(--vermelho-esc)}
 :focus-visible{outline:3px solid var(--vermelho);outline-offset:2px}
 .topo :focus-visible,.hero :focus-visible,.rodape :focus-visible{outline-color:#fff}
 
-/* Cabeçalho (celular: uma linha só, itens pequenos) */
+/* Cabeçalho (compacto; itens separados por barra vertical) */
 .topo{background:var(--preto);color:#fff;border-bottom:3px solid var(--vermelho)}
-.topo-in{max-width:68rem;margin:0 auto;padding:.45rem .75rem;display:flex;flex-wrap:wrap;gap:.35rem .5rem;align-items:center;justify-content:space-between}
+.topo-in{max-width:68rem;margin:0 auto;padding:.4rem .75rem;display:flex;flex-wrap:wrap;gap:.35rem .5rem;align-items:center;justify-content:space-between}
 .marca{display:flex;align-items:center;gap:.45rem;color:#fff;text-decoration:none;font:italic 800 1.15rem Georgia,"Times New Roman",serif}
 .marca img{display:block;border-radius:50%;width:28px;height:28px}
-.topo nav{display:flex;gap:.1rem}
-.topo nav a{display:block;text-align:center;color:#fff;text-decoration:none;font-weight:600;font-size:.82rem;line-height:1.2;padding:.55rem .5rem;border-radius:6px}
+.topo nav{--g:.4rem;display:flex;align-items:center;gap:var(--g)}
+.topo nav a{position:relative;display:block;text-align:center;color:#fff;text-decoration:none;font-weight:600;font-size:.8rem;line-height:1.2;padding:.4rem .45rem;border-radius:5px}
+.topo nav a + a::before{content:"";position:absolute;left:calc(var(--g) / -2);top:50%;height:1em;transform:translateY(-50%);border-left:1px solid #6b6b6b}
 .topo nav a:hover{background:#262626}
 .topo nav a[aria-current=page]{background:var(--vermelho)}
 .so-desk{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 @media (max-width:22rem){.topo nav{width:100%}.topo nav a{flex:1}}
 @media (min-width:48rem){
   .topo{position:sticky;top:0;z-index:5}
-  .topo-in{padding:.9rem 1rem;gap:.5rem 2rem}
-  .marca{gap:.7rem;font-size:1.6rem}
-  .marca img{width:40px;height:40px}
-  .topo nav{gap:.5rem}
-  .topo nav a{padding:.8rem 1.25rem;font-size:1rem;line-height:1.25}
+  .topo-in{padding:.65rem 1rem;gap:.5rem 2rem}
+  .marca{gap:.6rem;font-size:1.45rem}
+  .marca img{width:34px;height:34px}
+  .topo nav{--g:.8rem}
+  .topo nav a{padding:.45rem .9rem;font-size:.9rem;line-height:1.25}
   .so-desk{position:static;width:auto;height:auto;overflow:visible;clip:auto;white-space:normal}
 }
 
