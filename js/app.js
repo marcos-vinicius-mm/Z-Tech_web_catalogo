@@ -29,8 +29,12 @@
     c.append(imagem(item));
     const corpo = el('div', 'card-corpo');
     const titulo = el('h3'); const b = el('button', 'link-titulo', item.nome); b.type = 'button'; b.addEventListener('click', () => abrir(item)); titulo.append(b);
-    corpo.append(el('p', 'cat', item.categoria), titulo, el('p', 'preco', textoPreco(item.preco)));
-    if (aba === 'assistencia') corpo.append(el('p', 'meta', [item.prazo && 'Prazo: ' + item.prazo, item.garantia && 'Garantia: ' + item.garantia].filter(Boolean).join(' | ')));
+    corpo.append(el('p', 'cat', item.categoria), titulo);
+    if (aba === 'assistencia') {
+      const meta = [item.prazo && 'Prazo: ' + item.prazo, item.garantia && 'Garantia: ' + item.garantia].filter(Boolean).join(' | ');
+      if (meta) corpo.append(el('p', 'meta', meta));
+    }
+    corpo.append(el('p', 'preco', textoPreco(item.preco))); // por último: o CSS fixa o preço no pé do card, à esquerda
     c.append(corpo);
     return c;
   }
@@ -45,10 +49,9 @@
     const dl = el('dl');
     campos.filter((x) => x[1]).forEach(([k, v]) => dl.append(el('dt', null, k), el('dd', null, v)));
     box.append(dl);
-    const a = el('a', 'btn', aba === 'loja' ? 'Chamar no WhatsApp' : 'Pedir orçamento');
-    a.href = zap(aba === 'loja' ? 'Olá! Tenho interesse neste item: ' + item.nome : 'Olá! Gostaria de um orçamento para: ' + item.nome);
-    a.target = '_blank'; a.rel = 'noopener';
-    box.append(a);
+    const z = $('#detalhe-zap');
+    z.href = zap(aba === 'loja' ? 'Olá! Tenho interesse neste item: ' + item.nome : 'Olá! Gostaria de um orçamento para: ' + item.nome);
+    z.querySelector('.txt').textContent = aba === 'loja' ? 'Chamar no WhatsApp' : 'Pedir orçamento';
     d.showModal();
   }
 
@@ -68,6 +71,18 @@
     a.href = CONFIG.MAPS_URL || 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(CONFIG.ENDERECO);
     a.target = '_blank'; a.rel = 'noopener';
     p.replaceChildren(CONFIG.ENDERECO + ' | ' + CONFIG.HORARIO + ' | ', a);
+  }
+
+  // Ícone opcional nos botões verdes (.btn-zap): se existir img/whatsapp.svg (ou img/whatsapp.png), ele aparece antes do texto.
+  // Sem o arquivo, o botão fica só com o texto. Use um ícone branco, porque o botão é verde.
+  function iconeDoBotao() {
+    const botoes = document.querySelectorAll('.btn-zap'); if (!botoes.length) return;
+    const tentar = (src, senao) => {
+      const i = new Image();
+      i.onload = () => botoes.forEach((b) => { const c = i.cloneNode(); c.className = 'ico-zap'; c.alt = ''; c.setAttribute('aria-hidden', 'true'); b.prepend(c); });
+      i.onerror = senao; i.src = src;
+    };
+    tentar('img/whatsapp.svg', () => tentar('img/whatsapp.png', () => {}));
   }
 
   async function iniciar() {
@@ -144,13 +159,15 @@
     const ant = botao('seta', 'Comentário anterior'); ant.append(icone('M12.5 4l-6 6 6 6'));
     const prox = botao('seta', 'Próximo comentário'); prox.append(icone('M7.5 4l6 6-6 6'));
     const pontos = el('div', 'pontos');
-    const pausa = botao('pausa'); pausa.hidden = reduzido;
-    const ctl = el('div', 'carrossel-ctl'); ctl.append(ant, pontos, prox, pausa);
+    const ctl = el('div', 'carrossel-ctl'); ctl.append(ant, pontos, prox);
     regiao.append(faixa, ctl); $('#carrossel').replaceChildren(regiao);
     secao.hidden = false;
 
     const itens = [...faixa.children];
-    let tocando = !reduzido, suspenso = false, timer = null, raf = 0;
+    // Rotação automática a cada 6 s (desligada se o aparelho pede movimento reduzido). Não há botão de pausa:
+    // ela espera sozinha enquanto o mouse, o dedo ou o foco do teclado estão sobre o carrossel, e depois volta.
+    const automatico = !reduzido;
+    let sobre = false, foco = false, timer = null, raf = 0;
     const padE = () => parseFloat(getComputedStyle(faixa).paddingLeft) || 0;
     const porTela = () => Math.max(1, Math.round(faixa.clientWidth / itens[0].offsetWidth));
     const maxIdx = () => Math.max(0, itens.length - porTela());
@@ -165,31 +182,29 @@
 
     function montarPontos() {
       pontos.replaceChildren();
-      for (let i = 0; i <= maxIdx(); i++) { const p = botao('ponto', 'Ir para o comentário ' + (i + 1)); p.addEventListener('click', () => { parar(); ir(i); }); pontos.append(p); }
+      for (let i = 0; i <= maxIdx(); i++) { const p = botao('ponto', 'Ir para o comentário ' + (i + 1)); p.addEventListener('click', () => { ir(i); agendar(); }); pontos.append(p); }
       ctl.hidden = maxIdx() === 0; marcar();
     }
     function marcar() { const a = atual(); [...pontos.children].forEach((p, i) => p.setAttribute('aria-current', i === a ? 'true' : 'false')); }
-    function agendar() {
+    function agendar() { // (re)inicia a contagem; toda navegação manual também chama isto, então a próxima troca espera 6 s inteiros
       clearInterval(timer); timer = null;
-      faixa.setAttribute('aria-live', tocando ? 'off' : 'polite');
-      pausa.textContent = tocando ? 'Pausar' : 'Reproduzir';
-      if (tocando && !suspenso && !document.hidden && maxIdx() > 0) timer = setInterval(avancar, 6000);
+      const parado = sobre || foco;
+      faixa.setAttribute('aria-live', automatico && !parado ? 'off' : 'polite');
+      if (automatico && !parado && !document.hidden && maxIdx() > 0) timer = setInterval(avancar, 6000);
     }
-    function parar() { tocando = false; agendar(); } // qualquer interação manual encerra a rotação automática
 
-    ant.addEventListener('click', () => { parar(); voltar(); });
-    prox.addEventListener('click', () => { parar(); avancar(); });
-    pausa.addEventListener('click', () => { tocando = !tocando; agendar(); });
+    ant.addEventListener('click', () => { voltar(); agendar(); });
+    prox.addEventListener('click', () => { avancar(); agendar(); });
     faixa.addEventListener('scroll', () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(marcar); }, { passive: true });
-    faixa.addEventListener('pointerdown', parar);
     faixa.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowRight') { e.preventDefault(); parar(); avancar(); }
-      if (e.key === 'ArrowLeft') { e.preventDefault(); parar(); voltar(); }
+      if (e.key === 'ArrowRight') { e.preventDefault(); avancar(); agendar(); }
+      if (e.key === 'ArrowLeft') { e.preventDefault(); voltar(); agendar(); }
     });
-    regiao.addEventListener('mouseenter', () => { suspenso = true; agendar(); });
-    regiao.addEventListener('mouseleave', () => { suspenso = false; agendar(); });
-    regiao.addEventListener('focusin', () => { suspenso = true; agendar(); });
-    regiao.addEventListener('focusout', () => { suspenso = false; agendar(); });
+    // pointerenter/leave valem para mouse e para toque (no toque o "leave" vem quando o dedo sai), sem travar o carrossel depois de um toque.
+    regiao.addEventListener('pointerenter', () => { sobre = true; agendar(); });
+    regiao.addEventListener('pointerleave', () => { sobre = false; agendar(); });
+    regiao.addEventListener('focusin', (e) => { foco = e.target.matches(':focus-visible'); agendar(); }); // só o foco por teclado pausa
+    regiao.addEventListener('focusout', () => { foco = false; agendar(); });
     document.addEventListener('visibilitychange', agendar);
     let largura = faixa.clientWidth;
     window.addEventListener('resize', () => { if (faixa.clientWidth !== largura) { largura = faixa.clientWidth; montarPontos(); agendar(); } });
@@ -198,6 +213,7 @@
 
   document.addEventListener('DOMContentLoaded', () => {
     rodape();
+    iconeDoBotao();
     const fechar = $('#fechar'); if (fechar) fechar.addEventListener('click', () => $('#detalhe').close());
     if (document.body.dataset.aba) iniciar();
     depoimentos();
