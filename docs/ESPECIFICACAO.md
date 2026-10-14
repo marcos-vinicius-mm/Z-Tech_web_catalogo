@@ -17,10 +17,10 @@
 ## 3. Arquitetura
 
 - Site estático em HTML, CSS e JavaScript puro, sem frameworks e sem dependências externas de runtime.
-- Hospedagem estática (sugestão: GitHub Pages). **Local ainda não definido.**
+- Hospedagem estática no **GitHub Pages**.
 - Google Sheets como banco de dados e painel administrativo.
 - Leitura dos dados por **Apps Script publicado como Web App**, que devolve JSON consumido via `fetch`.
-- Alternativa para prototipagem: planilha publicada como CSV. Os relatos de CORS nessa rota são inconsistentes e não foram testados, então não deve ser a solução definitiva.
+- Método de leitura definido: **Apps Script** (a alternativa de planilha publicada como CSV foi descartada por relatos inconsistentes de CORS).
 - Descartado: sincronizar a planilha com o repositório por GitHub Action (só atualiza a cada sincronização).
 - Cache local (`localStorage`) com os últimos dados válidos, usado se a planilha falhar ou demorar.
 
@@ -61,15 +61,31 @@ A primeira linha de cada aba é o cabeçalho.
 | imagem | URL pública da imagem ou ícone |
 | ativo | `SIM` exibe; vazio ou `NAO` oculta |
 
+### Aba `Comentarios`
+
+Alimenta o carrossel de comentários de clientes na página inicial.
+
+| Coluna | Descrição |
+|---|---|
+| id | Gerado automaticamente (`C001`, `C002`...) |
+| nome | Nome exibido (de preferência o primeiro nome e a inicial do sobrenome) |
+| comentario | Texto do cliente (até cerca de 300 caracteres) |
+| nota | Opcional: número de 1 a 5 (estrelas) |
+| servico | Opcional: `Loja` ou `Assistência técnica` |
+| data | Opcional: `dd/mm/aaaa`, usada para mostrar os mais recentes primeiro |
+| ativo | `SIM` publica; vazio ou `NAO` oculta |
+
 ### Regras de dados
 
 - Preços seguem o formato brasileiro (vírgula decimal, ponto de milhar). Valores que não puderem ser interpretados são **rejeitados e registrados no console**, nunca "adivinhados" (evita o bug de preços dez vezes maiores visto em projeto real).
 - Linhas sem `id` ou sem `nome` são ignoradas.
-- Links normais do Google Drive não funcionam em `<img>`: usar URL pública ou converter o link do Drive pelo código do arquivo.
+- Imagens: o site aceita URL pública ou o link de compartilhamento do Google Drive, que é convertido pelo código do arquivo (o arquivo precisa estar com acesso "Qualquer pessoa com o link"). Link de pasta do Drive é ignorado.
+- Comentários: só saem da planilha com `ativo` = `SIM` (o Apps Script filtra no servidor); sem `id`, `nome` ou `comentario`, a linha é ignorada; nota fora de 1 a 5 é descartada e registrada no console. Só publicar comentário com a autorização do cliente.
 
 ## 5. Páginas e contato
 
-- **Início:** apresentação, dois atalhos principais (Loja e Assistência Técnica), contato, endereço e horário.
+- **Início:** apresentação, dois atalhos principais (Loja e Assistência Técnica), carrossel de comentários de clientes, contato, endereço e horário.
+- **Carrossel de comentários:** 1 comentário por tela no celular e 3 no desktop; setas, pontos, rolagem por toque e teclado; rotação automática a cada 6 s com botão Pausar (desligada com movimento reduzido e ao interagir); a seção fica oculta se não houver comentários ou se a leitura falhar.
 - **Loja:** grade de cards, busca, filtro por tipo e categoria, ordenação, detalhe do item em modal.
 - **Assistência Técnica:** serviços e consertos por categoria, com prazo e garantia.
 - **Produto:** botão "Chamar no WhatsApp" com o nome do item na mensagem.
@@ -80,7 +96,7 @@ A primeira linha de cada aba é o cabeçalho.
 
 - Marca: **Z-Tech Informática**. Logo em `site/img/logo.jpg` (completa) e `site/img/marca.png` (círculo, usado como favicon e no cabeçalho).
 - Paleta tirada da logo: preto `#000000`, branco `#FFFFFF` e vermelho `#C22127`. Vermelho escuro `#9A1A1F` para hover e texto sobre fundo claro (contraste).
-- Tipografia: títulos em serifa itálica em negrito, que lembra o logotipo; texto corrido em fonte do sistema (sem fontes externas).
+- Tipografia: família única **Inter** (sem serifa, padrão em lojas e interfaces de tecnologia), variável e hospedada em `fonts/inter.woff2` (licença OFL). Pesos 400, 500, 600, 700 e 800 e escala de tamanhos definidas como variáveis no CSS (12, 13, 14, 16, 18, 20 e 24 px, mais um tamanho fluido para o título). Sem itálico e sem fontes externas.
 - Cabeçalho preto com filete vermelho; página inicial abre com a logo sobre fundo preto.
 
 ## 7. Requisitos não funcionais
@@ -98,10 +114,8 @@ A primeira linha de cada aba é o cabeçalho.
 
 ## 9. Pendências
 
-- Número de WhatsApp da loja.
-- Endereço, horário e redes sociais.
-- Definição final do método de leitura (Apps Script ou CSV).
-- Local de hospedagem.
+- Redes sociais da loja.
+- Comentários reais de clientes (e autorização para publicá-los).
 
 ## 10. Plano de entrega
 
