@@ -108,9 +108,98 @@
     desenhar();
   }
 
+  // Carrossel de comentários de clientes (página inicial). Se não houver comentários, a seção continua oculta.
+  const SVGNS = 'http://www.w3.org/2000/svg';
+  function icone(caminho, cls) {
+    const s = document.createElementNS(SVGNS, 'svg');
+    s.setAttribute('viewBox', '0 0 20 20'); s.setAttribute('aria-hidden', 'true'); s.setAttribute('focusable', 'false');
+    if (cls) s.setAttribute('class', cls);
+    const p = document.createElementNS(SVGNS, 'path'); p.setAttribute('d', caminho); s.append(p);
+    return s;
+  }
+  const ESTRELA = 'M10 1.6l2.6 5.5 6 .8-4.4 4.2 1.1 6L10 15.2 4.7 18l1.1-6L1.4 7.9l6-.8z';
+  function estrelas(nota) {
+    const w = el('span', 'estrelas'); w.setAttribute('role', 'img'); w.setAttribute('aria-label', 'Nota ' + nota + ' de 5');
+    for (let i = 1; i <= 5; i++) w.append(icone(ESTRELA, i <= nota ? 'cheia' : 'vazia'));
+    return w;
+  }
+  function botao(cls, rotulo) { const b = el('button', cls); b.type = 'button'; if (rotulo) b.setAttribute('aria-label', rotulo); return b; }
+
+  async function depoimentos() {
+    const secao = $('#depoimentos'); if (!secao) return;
+    let lista;
+    try { lista = await Dados.carregarComentarios(); } catch (e) { return; } // na página inicial uma falha não vira mensagem de erro
+    if (!lista.length) return;
+
+    const reduzido = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const regiao = el('div', 'carrossel'); regiao.setAttribute('role', 'region'); regiao.setAttribute('aria-roledescription', 'carrossel'); regiao.setAttribute('aria-label', 'Comentários de clientes');
+    const faixa = el('div', 'faixa'); faixa.tabIndex = 0; faixa.setAttribute('aria-label', 'Comentários, use as setas do teclado para navegar');
+    lista.forEach((c, i) => {
+      const f = el('figure', 'depoimento'); f.setAttribute('role', 'group'); f.setAttribute('aria-roledescription', 'slide'); f.setAttribute('aria-label', (i + 1) + ' de ' + lista.length);
+      if (c.nota) f.append(estrelas(c.nota));
+      f.append(el('blockquote', null, c.texto));
+      const cap = el('figcaption'); cap.append(el('strong', null, c.nome)); if (c.servico) cap.append(' | ' + c.servico);
+      f.append(cap); faixa.append(f);
+    });
+    const ant = botao('seta', 'Comentário anterior'); ant.append(icone('M12.5 4l-6 6 6 6'));
+    const prox = botao('seta', 'Próximo comentário'); prox.append(icone('M7.5 4l6 6-6 6'));
+    const pontos = el('div', 'pontos');
+    const pausa = botao('pausa'); pausa.hidden = reduzido;
+    const ctl = el('div', 'carrossel-ctl'); ctl.append(ant, pontos, prox, pausa);
+    regiao.append(faixa, ctl); $('#carrossel').replaceChildren(regiao);
+    secao.hidden = false;
+
+    const itens = [...faixa.children];
+    let tocando = !reduzido, suspenso = false, timer = null, raf = 0;
+    const padE = () => parseFloat(getComputedStyle(faixa).paddingLeft) || 0;
+    const porTela = () => Math.max(1, Math.round(faixa.clientWidth / itens[0].offsetWidth));
+    const maxIdx = () => Math.max(0, itens.length - porTela());
+    function atual() {
+      let melhor = 0, d = Infinity;
+      itens.forEach((it, i) => { const x = Math.abs(it.offsetLeft - padE() - faixa.scrollLeft); if (x < d) { d = x; melhor = i; } });
+      return Math.min(melhor, maxIdx());
+    }
+    function ir(i) { faixa.scrollTo({ left: itens[Math.max(0, Math.min(i, maxIdx()))].offsetLeft - padE(), behavior: reduzido ? 'auto' : 'smooth' }); }
+    const avancar = () => { const i = atual(); ir(i >= maxIdx() ? 0 : i + 1); };
+    const voltar = () => { const i = atual(); ir(i <= 0 ? maxIdx() : i - 1); };
+
+    function montarPontos() {
+      pontos.replaceChildren();
+      for (let i = 0; i <= maxIdx(); i++) { const p = botao('ponto', 'Ir para o comentário ' + (i + 1)); p.addEventListener('click', () => { parar(); ir(i); }); pontos.append(p); }
+      ctl.hidden = maxIdx() === 0; marcar();
+    }
+    function marcar() { const a = atual(); [...pontos.children].forEach((p, i) => p.setAttribute('aria-current', i === a ? 'true' : 'false')); }
+    function agendar() {
+      clearInterval(timer); timer = null;
+      faixa.setAttribute('aria-live', tocando ? 'off' : 'polite');
+      pausa.textContent = tocando ? 'Pausar' : 'Reproduzir';
+      if (tocando && !suspenso && !document.hidden && maxIdx() > 0) timer = setInterval(avancar, 6000);
+    }
+    function parar() { tocando = false; agendar(); } // qualquer interação manual encerra a rotação automática
+
+    ant.addEventListener('click', () => { parar(); voltar(); });
+    prox.addEventListener('click', () => { parar(); avancar(); });
+    pausa.addEventListener('click', () => { tocando = !tocando; agendar(); });
+    faixa.addEventListener('scroll', () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(marcar); }, { passive: true });
+    faixa.addEventListener('pointerdown', parar);
+    faixa.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight') { e.preventDefault(); parar(); avancar(); }
+      if (e.key === 'ArrowLeft') { e.preventDefault(); parar(); voltar(); }
+    });
+    regiao.addEventListener('mouseenter', () => { suspenso = true; agendar(); });
+    regiao.addEventListener('mouseleave', () => { suspenso = false; agendar(); });
+    regiao.addEventListener('focusin', () => { suspenso = true; agendar(); });
+    regiao.addEventListener('focusout', () => { suspenso = false; agendar(); });
+    document.addEventListener('visibilitychange', agendar);
+    let largura = faixa.clientWidth;
+    window.addEventListener('resize', () => { if (faixa.clientWidth !== largura) { largura = faixa.clientWidth; montarPontos(); agendar(); } });
+    montarPontos(); agendar();
+  }
+
   document.addEventListener('DOMContentLoaded', () => {
     rodape();
     const fechar = $('#fechar'); if (fechar) fechar.addEventListener('click', () => $('#detalhe').close());
     if (document.body.dataset.aba) iniciar();
+    depoimentos();
   });
 })();

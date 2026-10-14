@@ -1,19 +1,24 @@
 // Cole no Apps Script da planilha (Extensões > Apps Script) e publique como Web App
-// (Executar como: você | Acesso: qualquer pessoa). Abas esperadas: "Loja" e "Assistencia".
+// (Executar como: você | Acesso: qualquer pessoa). Abas esperadas: "Loja", "Assistencia" e "Comentarios".
 
-const PREFIXOS = { Loja: 'L', Assistencia: 'A' }; // ids: L001, L002... / A001, A002...
+const PREFIXOS = { Loja: 'L', Assistencia: 'A', Comentarios: 'C' }; // ids: L001... / A001... / C001...
 
-// API: devolve as duas abas em JSON para o site.
+// API: devolve as abas em JSON para o site.
+// Comentários só saem daqui se estiverem com ativo = SIM, então um comentário ainda não aprovado nunca fica público.
 function doGet() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const ler = (nome) => {
+  const ler = (nome, soAtivos) => {
     const aba = ss.getSheetByName(nome);
     if (!aba) return [];
     const [cab, ...linhas] = aba.getDataRange().getDisplayValues(); // texto como exibido (preço BR intacto)
-    return linhas.map((l) => Object.fromEntries(cab.map((c, i) => [String(c).trim(), l[i]])));
+    const objetos = linhas.map((l) => Object.fromEntries(cab.map((c, i) => [String(c).trim(), l[i]])));
+    return soAtivos ? objetos.filter((o) => String(o.ativo).trim().toUpperCase() === 'SIM') : objetos;
   };
-  return ContentService.createTextOutput(JSON.stringify({ loja: ler('Loja'), assistencia: ler('Assistencia') }))
-    .setMimeType(ContentService.MimeType.JSON);
+  return ContentService.createTextOutput(JSON.stringify({
+    loja: ler('Loja'),
+    assistencia: ler('Assistencia'),
+    comentarios: ler('Comentarios', true)
+  })).setMimeType(ContentService.MimeType.JSON);
 }
 
 // ID automático: ao preencher o "nome" de uma linha sem id, gera o próximo número da sequência.

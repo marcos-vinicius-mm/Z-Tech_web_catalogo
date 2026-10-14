@@ -52,6 +52,26 @@
       }));
   }
 
+  // Comentários de clientes: id, nome, comentario e ativo = SIM são obrigatórios. Nota (1 a 5), serviço e data são opcionais.
+  function lerData(bruto) {
+    const s = t(bruto); let m;
+    if ((m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/))) return Date.UTC(+m[3], +m[2] - 1, +m[1]);
+    if ((m = s.match(/^(\d{4})-(\d{2})-(\d{2})/))) return Date.UTC(+m[1], +m[2] - 1, +m[3]);
+    return 0;
+  }
+
+  function normalizarComentarios(linhas) {
+    return (Array.isArray(linhas) ? linhas : [])
+      .filter((l) => t(l.id) && t(l.nome) && t(l.comentario) && t(l.ativo).toUpperCase() === 'SIM')
+      .map((l, i) => {
+        const notaBruta = t(l.nota);
+        const nota = /^[1-5]$/.test(notaBruta) ? Number(notaBruta) : 0;
+        if (notaBruta && !nota) console.warn('[Z-Tech] Nota ignorada (use um número de 1 a 5):', l.id, notaBruta);
+        return { id: t(l.id), nome: t(l.nome), texto: t(l.comentario), nota, servico: t(l.servico), quando: lerData(l.data), ordem: i };
+      })
+      .sort((a, b) => (b.quando - a.quando) || (a.ordem - b.ordem)); // mais recentes primeiro; sem data, ordem da planilha
+  }
+
   function erro(motivo, causa, definitivo) { const e = new Error(motivo); e.motivo = motivo; e.causa = causa; e.definitivo = !!definitivo; return e; }
 
   // Uma tentativa de leitura. O motivo da falha fica explícito para facilitar o diagnóstico em outros aparelhos.
@@ -98,6 +118,10 @@
     async carregar(aba) {
       const { dados, origem } = await buscar();
       return { itens: normalizar(dados[aba]), origem };
+    },
+    async carregarComentarios() {
+      const { dados } = await buscar();
+      return normalizarComentarios(dados.comentarios);
     }
   };
 })();
