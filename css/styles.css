@@ -155,7 +155,7 @@ dialog h2{margin:1rem 0 .25rem;font-size:var(--t-2xl)}
 .btn-zap{flex:1 1 0;gap:.4rem;background:var(--verde)}
 .btn-zap:hover{background:var(--verde-esc)}
 .ico-zap{flex:none;width:1.2rem;height:1.2rem;object-fit:contain;background:var(--verde)}
-.ico-zap{flex:none;width:1.2rem;height:1.2rem;object-fit:contain;background:var(--verde-esc)}
+.ico-zap:hover{flex:none;width:1.2rem;height:1.2rem;object-fit:contain;background:var(--verde-esc)}
 .btn-sec{flex:0 0 auto;background:#fff;color:var(--tinta);border:1px solid #bdbdbd}
 .btn-sec:hover{background:#f0f0f0}
 @media (max-width:26rem){.acoes .btn{font-size:var(--t-sm);padding:.6rem .6rem}.btn-zap{gap:.3rem}.ico-zap{width:1.1rem;height:1.1rem}}
