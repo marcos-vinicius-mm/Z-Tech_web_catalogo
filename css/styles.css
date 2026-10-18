@@ -46,8 +46,8 @@ h1::after{content:"";display:block;width:3rem;height:4px;background:var(--vermel
 h1[hidden]{display:none}
 
 /* Botões */
-.btn{display:inline-flex;align-items:center;justify-content:center;min-height:46px;background:var(--vermelho);color:#fff;font:inherit;font-weight:var(--p-bold);padding:.65rem 1.5rem;border-radius:6px;text-decoration:none;border:0;cursor:pointer;transition:background .15s}
-.btn:hover{background:var(--vermelho-esc)}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:46px;background:var(--verde);color:#fff;font:inherit;font-weight:var(--p-bold);padding:.65rem 1.5rem;border-radius:6px;text-decoration:none;border:0;cursor:pointer;transition:background .15s}
+.btn:hover{background:var(--verde-esc)}
 
 /* Página inicial */
 .hero{background:#000;color:#fff;text-align:center;padding:2rem 1rem 4rem}
@@ -154,8 +154,8 @@ dialog h2{margin:1rem 0 .25rem;font-size:var(--t-2xl)}
 .acoes .btn{padding:.6rem .9rem;line-height:1.2;text-align:center}
 .btn-zap{flex:1 1 0;gap:.4rem;background:var(--verde)}
 .btn-zap:hover{background:var(--verde-esc)}
-.ico-zap{flex:none;width:1.2rem;height:1.2rem;object-fit:contain;background:var(--verde)}
-.ico-zap:hover{flex:none;width:1.2rem;height:1.2rem;object-fit:contain;background:var(--verde-esc)}
+.ico-zap{flex:none;width:1.5rem;height:1.5rem;object-fit:contain;background:var(--verde);border:0px}
+.ico-zap:hover{flex:none;width:1.5rem;height:1.5rem;object-fit:contain;background:var(--verde-esc);border:0px}
 .btn-sec{flex:0 0 auto;background:#fff;color:var(--tinta);border:1px solid #bdbdbd}
 .btn-sec:hover{background:#f0f0f0}
 @media (max-width:26rem){.acoes .btn{font-size:var(--t-sm);padding:.6rem .6rem}.btn-zap{gap:.3rem}.ico-zap{width:1.1rem;height:1.1rem}}
