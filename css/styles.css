@@ -158,11 +158,11 @@ dialog h2{margin:1rem 0 .25rem;font-size:var(--t-2xl)}
 .ico-zap:hover{flex:none;width:1.5rem;height:1.5rem;object-fit:contain;background:var(--verde-esc);border:0px}
 .btn-sec{flex:0 0 auto;background:#fff;color:var(--tinta);border:1px solid #bdbdbd}
 .btn-sec:hover{background:#f0f0f0}
-.btn-share{flex:0 0 auto;gap:.4rem;min-width:46px}
-.btn-share svg{flex:none;width:1.15rem;height:1.15rem;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-.btn-share .txt{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-@media (min-width:30rem){.btn-share .txt{position:static;width:auto;height:auto;overflow:visible;clip:auto;white-space:normal}}
-.copiado{margin:.75rem 0 0;text-align:center;font-size:var(--t-md);font-weight:var(--p-semi);color:var(--verde-esc)}
+.btn-share{all:unset;box-sizing:border-box;position:absolute;z-index:2;top:1.75rem;right:1.75rem;display:grid;place-items:center;width:42px;height:42px;border-radius:50%;background:#ffffffeb;color:var(--tinta);border:1px solid #0003;box-shadow:0 2px 8px #0003;cursor:pointer;transition:background .15s,transform .15s}
+.btn-share:hover{background:#fff;transform:scale(1.06)}
+.btn-share:focus-visible{outline:3px solid var(--vermelho);outline-offset:2px}
+.btn-share svg{width:1.3rem;height:1.3rem;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.copiado{position:absolute;z-index:2;top:calc(1.75rem + 42px + .4rem);right:1.75rem;margin:0;padding:.35rem .65rem;border-radius:6px;background:#111;color:#fff;font-size:var(--t-sm);font-weight:var(--p-semi);box-shadow:0 2px 8px #0003}
 .copiado:empty{display:none}
 @media (max-width:26rem){.acoes .btn{font-size:var(--t-sm);padding:.6rem .6rem}.btn-zap{gap:.3rem}.ico-zap{width:1.1rem;height:1.1rem}}
 dl{display:grid;grid-template-columns:auto 1fr;gap:.35rem 1rem;margin:1rem 0}

@@ -217,7 +217,7 @@ Preto, compacto, com filete vermelho e itens separados por barra vertical (`Iní
 - Contador de itens e atalho **Limpar filtros**.
 - **Cards:** 2 por linha no celular e grade automática (cards de pelo menos 15 rem) a partir de 40 rem. Cada card mostra imagem, categoria, nome (até 3 linhas) e **preço fixo no canto inferior esquerdo**.
 - **Imagens padronizadas:** moldura única de proporção 4:3; a foto aparece inteira dentro dela (`object-fit: contain`, fundo branco), sem cortar nem vazar. Sem foto, aparece a marca Z-Tech sobre fundo preto; se a foto falhar ao carregar, aparece "Foto indisponível".
-- **Detalhe (janela modal):** foto, nome, preço, descrição e ficha (marca, condição, estoque, compatibilidade). Botões **Fechar**, **Compartilhar** e **Chamar no WhatsApp** lado a lado, com o ícone `img/whatsapp.svg`. A mensagem enviada é "Olá! Tenho interesse neste item: *nome*".
+- **Detalhe (janela modal):** foto, nome, preço, descrição e ficha (marca, condição, estoque, compatibilidade). Botões **Fechar** e **Chamar no WhatsApp** (com o ícone `img/whatsapp.svg`) lado a lado, e um botão redondo só com o ícone de **compartilhar** sobre o canto superior direito da foto. A mensagem enviada é "Olá! Tenho interesse neste item: *nome*".
 - **Compartilhar link:** gera um link direto do item (`loja.html?item=L001`). No celular abre o menu de compartilhamento do aparelho; onde não existir, copia o link e mostra "Link copiado!". Quem abrir o link já vê o detalhe do item aberto; se o item tiver sido desativado ou removido da planilha, aparece um aviso. A prévia do link em redes e mensageiros mostra o título e a logo gerais do site (o site é estático, então não há prévia por item).
 
 ### Assistência técnica (`assistencia.html`)
