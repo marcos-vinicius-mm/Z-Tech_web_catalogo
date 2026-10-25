@@ -12,7 +12,7 @@
 <meta property="og:image" content="img/logo.jpg">
 <link rel="icon" type="image/png" href="img/marca.png">
 <link rel="preload" href="fonts/inter.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="css/styles.css?v=4">
+<link rel="stylesheet" href="css/styles.css?v=5">
 </head>
 <body data-aba="assistencia">
 <header class="topo"><div class="topo-in"><a class="marca" href="index.html"><img src="img/marca.png" alt="" width="40" height="40"><span>Z-TECH</span></a>
@@ -25,12 +25,12 @@
 <p id="aviso" class="aviso" role="status"></p>
 <p id="estado" class="estado" role="status" hidden></p>
 <div id="grade" class="grade"></div>
-<dialog id="detalhe" aria-label="Detalhes"><div id="detalhe-conteudo"></div><p id="copiado" class="copiado" role="status"></p><div class="acoes"><button id="fechar" class="btn btn-sec" type="button">Fechar</button><button id="compartilhar" class="btn btn-sec btn-share" type="button" aria-label="Compartilhar link do item" title="Compartilhar link do item"><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><circle cx="5" cy="10" r="2.2"/><circle cx="15" cy="4.8" r="2.2"/><circle cx="15" cy="15.2" r="2.2"/><path d="M7 9l6-3M7 11l6 3"/></svg><span class="txt">Compartilhar</span></button><a id="detalhe-zap" class="btn btn-zap" href="#" target="_blank" rel="noopener"><span class="txt">Pedir orçamento</span></a></div></dialog>
+<dialog id="detalhe" aria-label="Detalhes"><button id="compartilhar" class="btn-share" type="button" aria-label="Compartilhar link do item" title="Compartilhar link do item"><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><circle cx="5" cy="10" r="2.2"/><circle cx="15" cy="4.8" r="2.2"/><circle cx="15" cy="15.2" r="2.2"/><path d="M7 9l6-3M7 11l6 3"/></svg></button><p id="copiado" class="copiado" role="status"></p><div id="detalhe-conteudo"></div><div class="acoes"><button id="fechar" class="btn btn-sec" type="button">Fechar</button><a id="detalhe-zap" class="btn btn-zap" href="#" target="_blank" rel="noopener"><span class="txt">Pedir orçamento</span></a></div></dialog>
 </main>
 <footer class="rodape"><p id="endereco"></p></footer>
-<script src="js/config.js?v=4"></script>
-<script src="js/dados.js?v=4"></script>
-<script src="js/app.js?v=4"></script>
+<script src="js/config.js?v=5"></script>
+<script src="js/dados.js?v=5"></script>
+<script src="js/app.js?v=5"></script>
 <script>document.getElementById('endereco').textContent=CONFIG.ENDERECO+' | '+CONFIG.HORARIO;</script>
 </body>
 </html>
