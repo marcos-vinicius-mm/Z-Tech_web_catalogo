@@ -52,7 +52,35 @@
     const z = $('#detalhe-zap');
     z.href = zap(aba === 'loja' ? 'Olá! Tenho interesse neste item: ' + item.nome : 'Olá! Gostaria de um orçamento para: ' + item.nome);
     z.querySelector('.txt').textContent = aba === 'loja' ? 'Chamar no WhatsApp' : 'Pedir orçamento';
+    const c = $('#compartilhar'); if (c) c.onclick = () => compartilhar(item, aba);
+    const msg = $('#copiado'); if (msg) msg.textContent = '';
     d.showModal();
+  }
+
+  // Link direto do item: a mesma página com ?item=<id>. Quem abrir o link já vê o detalhe do item.
+  function linkDoItem(item) {
+    const u = new URL(location.href);
+    u.search = '?item=' + encodeURIComponent(item.id); u.hash = '';
+    return u.toString();
+  }
+
+  let avisoTimer = 0;
+  function avisarCopiado(texto) {
+    const m = $('#copiado'); if (!m) return;
+    m.textContent = texto;
+    clearTimeout(avisoTimer); avisoTimer = setTimeout(() => { m.textContent = ''; }, 3000);
+  }
+
+  // Compartilhar: usa o menu nativo do aparelho (WhatsApp, Instagram, e-mail...) quando existe; senão copia o link.
+  async function compartilhar(item, aba) {
+    const url = linkDoItem(item);
+    const dados = { title: item.nome + ' | ' + CONFIG.NOME, text: (aba === 'loja' ? 'Olha este item da ' : 'Olha este serviço da ') + CONFIG.NOME + ': ' + item.nome, url };
+    if (navigator.share) {
+      try { await navigator.share(dados); return; }
+      catch (e) { if (e && e.name === 'AbortError') return; /* usuário cancelou; outros erros caem na cópia */ }
+    }
+    try { await navigator.clipboard.writeText(url); avisarCopiado('Link copiado!'); }
+    catch (e) { window.prompt('Copie o link do item:', url); }
   }
 
   function estado(msg, erro) { const s = $('#estado'); s.textContent = msg; s.hidden = !msg; s.className = 'estado' + (erro ? ' erro' : ''); }
@@ -121,6 +149,17 @@
     }
     Object.values(filtros).forEach((f) => f && f.addEventListener('input', desenhar));
     desenhar();
+
+    // Abre o detalhe quando a página é aberta por um link compartilhado (?item=ID).
+    const dlg = $('#detalhe');
+    const pedido = new URLSearchParams(location.search).get('item');
+    if (pedido) {
+      const achado = itens.find((i) => i.id === pedido);
+      if (achado) detalhe(achado, aba);
+      else if (!aviso) $('#aviso').textContent = 'O item do link compartilhado não está mais disponível.';
+    }
+    // Ao fechar, tira o ?item= do endereço para não reabrir ao recarregar.
+    dlg.addEventListener('close', () => { if (new URLSearchParams(location.search).has('item')) history.replaceState(null, '', location.pathname); });
   }
 
   // Carrossel de comentários de clientes (página inicial). Se não houver comentários, a seção continua oculta.
